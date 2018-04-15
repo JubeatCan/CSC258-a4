@@ -10,7 +10,7 @@
 #include "simplegraph.h"
 #include "lockfree_queue.h"
 #include "Timer.h"
-typedef SimpleCSRGraph<unsigned int, std::atomic<int>> SimpleCSRGraphUIAI;
+typedef SimpleCSRGraph<unsigned int, std::atomic<int> > SimpleCSRGraphUIAI;
 
 const int INF = INT_MAX;
 int numofthreads;
@@ -32,12 +32,12 @@ void sssp() {
       for(unsigned int e = input.row_start[node]; e < input.row_start[node + 1]; e++) {
 
         unsigned int dest = input.edge_dst[e];
-        int distance = input.node_wt[node] + input.edge_wt[e];
+        int distance = input.node_wt[node].load( std::memory_order_relaxed )  + input.edge_wt[e];
 
-        int prev_distance = input.node_wt[dest];
+        int prev_distance = input.node_wt[dest].load( std::memory_order_relaxed ) ;
 
         if(prev_distance > distance) {
-          input.node_wt[dest] = distance;
+          input.node_wt[dest].store(distance, std::memory_order_relaxed );
           //input.node_wt[dest].store(distance, std::memory_order_relaxed );
           //input.node_wt[dest].compare_exchange_weak(prev_distance,distance);
           if(!sq.push(dest)) {
