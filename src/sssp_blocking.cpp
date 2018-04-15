@@ -27,26 +27,32 @@ void sssp_init(unsigned int src) {
 void sssp() {
   bool changed = false;
   int node;
+  //while(true){
+    while(sq.pop(node)) {
+      for(unsigned int e = input.row_start[node]; e < input.row_start[node + 1]; e++) {
 
-  while(sq.pop(node)) {
-    for(unsigned int e = input.row_start[node]; e < input.row_start[node + 1]; e++) {
+        unsigned int dest = input.edge_dst[e];
+        int distance = input.node_wt[node].load( std::memory_order_relaxed )  + input.edge_wt[e];
 
-      unsigned int dest = input.edge_dst[e];
-      int distance = input.node_wt[node] + input.edge_wt[e];
-
-      int prev_distance = input.node_wt[dest];
-      
-      if(prev_distance > distance) {
-        //input.node_wt[dest].store(distance, std::memory_order_relaxed );
-	input.node_wt[dest] = distance;
-	if(!sq.push(dest)) {
-	  fprintf(stderr, "ERROR: Out of queue space.\n");
-	  exit(1);
-	}
+        for(;;){
+        int prev_distance = input.node_wt[dest];
+        
+        if(prev_distance <= distance) {
+          break;
+        }else if(input.node_wt[dest].compare_exchange_weak(prev_distance, distance)){
+          changed = true;
+          if(!sq.push(dest)) {
+	          fprintf(stderr, "ERROR: Out of queue space.\n");
+	          exit(1);
+	        }
+          break;
+        }
       }
+      }
+   
     }
+    
   }
-}
 
 void write_output(SimpleCSRGraphUII &g, const char *out) {
   FILE *fp; 
@@ -62,7 +68,7 @@ void write_output(SimpleCSRGraphUII &g, const char *out) {
     if(g.node_wt[i] == INF) {
       r = fprintf(fp, "%d INF\n", i);
     } else {
-      r = fprintf(fp, "%d %d\n", i, g.node_wt[i]);
+      r = fprintf(fp, "%d %d\n", i, g.node_wt[i].load());
     }
 
     if(r < 0) {
