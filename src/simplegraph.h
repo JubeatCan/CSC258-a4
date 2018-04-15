@@ -118,5 +118,5 @@ class SimpleCSRGraph {
   }
 };
 
-typedef SimpleCSRGraph<unsigned int, int> SimpleCSRGraphUII;
+//typedef SimpleCSRGraph<unsigned int, int> SimpleCSRGraphUII;
 
