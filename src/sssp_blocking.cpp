@@ -37,8 +37,8 @@ void sssp() {
       int prev_distance = input.node_wt[dest];
       
       if(prev_distance > distance) {
-        input.node_wt[dest].store(distance, std::memory_order_relaxed );
-	//input.node_wt[dest] = distance;
+        //input.node_wt[dest].store(distance, std::memory_order_relaxed );
+	input.node_wt[dest] = distance;
 	if(!sq.push(dest)) {
 	  fprintf(stderr, "ERROR: Out of queue space.\n");
 	  exit(1);
