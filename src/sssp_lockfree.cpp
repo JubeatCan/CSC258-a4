@@ -5,7 +5,7 @@
 #include <limits.h>
 #include <thread>
 #include <cstring>
-#include <stomic>
+#include <atomic>
 #include "simplegraph.h"
 #include "lockfree_queue.h"
 #include "Timer.h"
