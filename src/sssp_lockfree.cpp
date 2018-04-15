@@ -87,6 +87,7 @@ else{
 }
 }
 }
+}
 
 void write_output(SimpleCSRGraphUII &g, const char *out) {
   FILE *fp;
