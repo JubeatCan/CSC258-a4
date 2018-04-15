@@ -12,5 +12,5 @@ lf_test: test2.cpp lockfree_queue.h
 sssp_blocking: sssp_blocking.cpp Timer.h simplegraph.h blocking_queue.h
 	g++ -g -std=c++11 -pthread -O3 $< -o $@
 
-sssp_lockfree: sssp_blocking.cpp Timer.h simplegraph.h lockfree_queue.h
+sssp_lockfree: sssp_lockfree.cpp Timer.h simplegraph.h lockfree_queue.h
 	g++ -g -std=c++11 -pthread -O3 $< -o $@
