@@ -101,7 +101,7 @@ void write_output(SimpleCSRGraphUII &g, const char *out) {
     if(g.node_wt[i] == INF) {
       r = fprintf(fp, "%d INF\n", i);
     } else {
-      r = fprintf(fp, "%d %d\n", i, g.node_wt[i]);
+      r = fprintf(fp, "%d %d\n", i, g.node_wt[i].load());
     }
 
     if(r < 0) {
