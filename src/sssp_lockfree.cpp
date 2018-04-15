@@ -16,7 +16,7 @@ const int INF = INT_MAX;
 int numofthreads;
 SimpleCSRGraphUII input;
 LockfreeQueue sq;
-std::atomic<int> count = 0;
+std::atomic<int> count{0};
 
 void sssp_init(unsigned int src) {
   for(int i = 0; i < input.num_nodes; i++) {
@@ -31,18 +31,19 @@ while(true){
   while(sq.pop(node)) {
     for(unsigned int e = input.row_start[node]; e < input.row_start[node + 1]; e++) {
 
-  //     unsigned int dest = input.edge_dst[e];
-  //     int distance = input.node_wt[node] + input.edge_wt[e];
+      unsigned int dest = input.edge_dst[e];
+      int distance = input.node_wt[node] + input.edge_wt[e];
 
-  //     int prev_distance = input.node_wt[dest];
+      int prev_distance = input.node_wt[dest];
 
-  //     if(prev_distance > distance) {
-  //       //input.node_wt[dest].store(distance, std::memory_order_relaxed );
-	//       input.node_wt[dest].compare_exchange_weak(prev_distance,distance);
-	// if(!sq.push(dest)) {
-	//   fprintf(stderr, "ERROR: Out of queue space.\n");
-	//   exit(1);
-	// }
+      if(prev_distance > distance) {
+        input.node_wt[dest] = distance;
+        //input.node_wt[dest].store(distance, std::memory_order_relaxed );
+	      //input.node_wt[dest].compare_exchange_weak(prev_distance,distance);
+	if(!sq.push(dest)) {
+	  fprintf(stderr, "ERROR: Out of queue space.\n");
+	  exit(1);
+	}
     
   //   }
   // for(;;){
@@ -60,19 +61,19 @@ while(true){
   //       }
   //   }
        
-      unsigned int dest = input.edge_dst[e];
-      int distance = input.node_wt[node].load( std::memory_order_relaxed ) + input.edge_wt[e];
+      // unsigned int dest = input.edge_dst[e];
+      // int distance = input.node_wt[node].load( std::memory_order_relaxed ) + input.edge_wt[e];
 
-      int prev_distance = input.node_wt[dest].load( std::memory_order_relaxed );
+      // int prev_distance = input.node_wt[dest].load( std::memory_order_relaxed );
       
-      if(prev_distance > distance) {
-        input.node_wt[dest].store(distance, std::memory_order_relaxed );
-        //changed = true;
-        if(!sq.push(dest)) {
-	         fprintf(stderr, "ERROR: Out of queue space.\n");
-	         exit(1);
-	       }
-      }
+      // if(prev_distance > distance) {
+      //   input.node_wt[dest].store(distance, std::memory_order_relaxed );
+      //   //changed = true;
+      //   if(!sq.push(dest)) {
+	    //      fprintf(stderr, "ERROR: Out of queue space.\n");
+	    //      exit(1);
+	    //    }
+      // }
     
   }
 }
