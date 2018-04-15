@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <thread>
 #include <cstring>
+#include <mutex>
 #include <atomic>
 #include "simplegraph.h"
 #include "lockfree_queue.h"
@@ -31,29 +32,30 @@ void sssp() {
       unsigned int dest = input.edge_dst[e];
       int distance = input.node_wt[node] + input.edge_wt[e];
 
-  //     int prev_distance = input.node_wt[dest];
+      int prev_distance = input.node_wt[dest];
 
-  //     if(prev_distance > distance) {
-	// input.node_wt[dest].compare_exchange_weak(prev_distance,distance);
-	// if(!sq.push(dest)) {
-	//   fprintf(stderr, "ERROR: Out of queue space.\n");
-	//   exit(1);
-	// }
-  //     }
-  for(;;){
-        int prev_distance = g.node_wt[dest];
+      if(prev_distance > distance) {
+        input.node_wt[dest].store(distance, std::memory_order_relaxed );
+	//input.node_wt[dest].compare_exchange_weak(prev_distance,distance);
+	if(!sq.push(dest)) {
+	  fprintf(stderr, "ERROR: Out of queue space.\n");
+	  exit(1);
+	}
+      }
+  // for(;;){
+  //       int prev_distance = g.node_wt[dest];
         
-        if(prev_distance <= distance) {
-          break;
-        }else if(g.node_wt[dest].compare_exchange_weak(prev_distance, distance)){
-          //changed = true;
-          if(!sq.push(dest)) {
-	          fprintf(stderr, "ERROR: Out of queue space.\n");
-	          exit(1);
-	        }
-          break;
-        }
-    }
+  //       if(prev_distance <= distance) {
+  //         break;
+  //       }else if(g.node_wt[dest].compare_exchange_weak(prev_distance, distance)){
+  //         //changed = true;
+  //         if(!sq.push(dest)) {
+	//           fprintf(stderr, "ERROR: Out of queue space.\n");
+	//           exit(1);
+	//         }
+  //         break;
+  //       }
+  //   }
   }
 }
 }
