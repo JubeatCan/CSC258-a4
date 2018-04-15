@@ -17,6 +17,7 @@ const int INF = INT_MAX;
 int numofthreads;
 SimpleCSRGraphUII input;
 BlockingQueue sq;
+int check[170] = {0};
 
 void sssp_init(unsigned int src) {
   for(int i = 0; i < input.num_nodes; i++) {
@@ -24,11 +25,15 @@ void sssp_init(unsigned int src) {
   }
 }
 
-void sssp() {
-  bool changed = false;
+void sssp(int t) {
+  
   int node;
-  //while(true){
+  bool flag = true;
+  
+  while(true){
+    flag = true;
     while(sq.pop(node)) {
+      check[t] = 0;
       for(unsigned int e = input.row_start[node]; e < input.row_start[node + 1]; e++) {
 
         unsigned int dest = input.edge_dst[e];
@@ -40,20 +45,33 @@ void sssp() {
         if(prev_distance <= distance) {
           break;
         }else if(input.node_wt[dest].compare_exchange_weak(prev_distance, distance)){
-          changed = true;
+          
           if(!sq.push(dest)) {
 	          fprintf(stderr, "ERROR: Out of queue space.\n");
 	          exit(1);
 	        }
           break;
+          }
         }
       }
-      }
-   
+      
     }
+    check[t] = 1;
+    for(int i = 0; i < numofthreads; i++)
+    {
+      if(!check[i])
+      {
+        flag = false;
+        break;
+      }
+    }
+    if(flag)
+      break;
+    else
+      continue;
     
   }
-
+}
 void write_output(SimpleCSRGraphUII &g, const char *out) {
   FILE *fp; 
   
@@ -80,6 +98,7 @@ void write_output(SimpleCSRGraphUII &g, const char *out) {
 
 int main(int argc, char *argv[]) 
 {
+  
   if(argc != 4) {
     fprintf(stderr, "Usage: %s inputgraph outputfile numofthreads\n", argv[0]);
     exit(1);
@@ -117,8 +136,9 @@ int main(int argc, char *argv[])
   sq.push(src);
   for(int i = 0; i < numofthreads; i++)
   {
-    threads[i] = std::thread(sssp);
+    threads[i] = std::thread(sssp,i);
   }
+
   for(int i = 0; i < numofthreads; i++)
   {
     threads[i].join();
