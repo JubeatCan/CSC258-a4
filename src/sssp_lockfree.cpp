@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
   printf("Loaded '%s', %u nodes, %u edges\n", argv[1], input.num_nodes, input.num_edges);
 
   /* if you want to use dynamic allocation, go ahead */
-  sq.initialize(input.num_edges * 2); // should be enough ...
+  sq.initialize(); // should be enough ...
 
   ggc::Timer t("sssp");
 
