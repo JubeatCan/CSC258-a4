@@ -31,17 +31,31 @@ void sssp() {
       unsigned int dest = input.edge_dst[e];
       int distance = input.node_wt[node] + input.edge_wt[e];
 
-      int prev_distance = input.node_wt[dest];
+  //     int prev_distance = input.node_wt[dest];
 
-      if(prev_distance > distance) {
-	input.node_wt[dest].compare_exchange_weak(prev_distance,distance);
-	if(!sq.push(dest)) {
-	  fprintf(stderr, "ERROR: Out of queue space.\n");
-	  exit(1);
-	}
-      }
+  //     if(prev_distance > distance) {
+	// input.node_wt[dest].compare_exchange_weak(prev_distance,distance);
+	// if(!sq.push(dest)) {
+	//   fprintf(stderr, "ERROR: Out of queue space.\n");
+	//   exit(1);
+	// }
+  //     }
+  for(;;){
+        int prev_distance = g.node_wt[dest];
+        
+        if(prev_distance <= distance) {
+          break;
+        }else if(g.node_wt[dest].compare_exchange_weak(prev_distance, distance)){
+          //changed = true;
+          if(!sq.push(dest)) {
+	          fprintf(stderr, "ERROR: Out of queue space.\n");
+	          exit(1);
+	        }
+          break;
+        }
     }
   }
+}
 }
 
 void write_output(SimpleCSRGraphUII &g, const char *out) {
