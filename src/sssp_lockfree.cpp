@@ -34,18 +34,20 @@ void sssp() {
         unsigned int dest = input.edge_dst[e];
         int distance = input.node_wt[node].load( std::memory_order_relaxed )  + input.edge_wt[e];
 
-        int prev_distance = input.node_wt[dest].load( std::memory_order_relaxed ) ;
-
-        if(prev_distance > distance) {
-          input.node_wt[dest].store(distance, std::memory_order_relaxed );
-          //input.node_wt[dest].store(distance, std::memory_order_relaxed );
-          //input.node_wt[dest].compare_exchange_weak(prev_distance,distance);
+        for(;;){
+        int prev_distance = input.node_wt[dest];
+        
+        if(prev_distance <= distance) {
+          break;
+        }else if(input.node_wt[dest].compare_exchange_weak(prev_distance, distance)){
+          changed = true;
           if(!sq.push(dest)) {
-            fprintf(stderr, "ERROR: Out of queue space.\n");
-            exit(1);
-          }
-      
+	          fprintf(stderr, "ERROR: Out of queue space.\n");
+	          exit(1);
+	        }
+          break;
         }
+      }
       }
     // for(;;){
     //       int prev_distance = input.node_wt[dest];

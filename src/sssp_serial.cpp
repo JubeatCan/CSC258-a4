@@ -6,6 +6,7 @@
 #include "simplegraph.h"
 #include "serialqueue.h"
 #include "Timer.h"
+typedef SimpleCSRGraph<unsigned int, int > SimpleCSRGraphUII;
 
 const int INF = INT_MAX;
 
