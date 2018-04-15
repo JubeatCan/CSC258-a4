@@ -5,9 +5,13 @@
 #include <limits.h>
 #include <thread>
 #include <cstring>
+#include <atomic>
+#include <mutex>
 #include "simplegraph.h"
 #include "blocking_queue.h"
 #include "Timer.h"
+
+typedef SimpleCSRGraph<unsigned int, std::atomic<int>> SimpleCSRGraphUIAI;
 
 const int INF = INT_MAX;
 int numofthreads;

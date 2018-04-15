@@ -10,6 +10,7 @@
 #include "simplegraph.h"
 #include "lockfree_queue.h"
 #include "Timer.h"
+typedef SimpleCSRGraph<unsigned int, std::atomic<int>> SimpleCSRGraphUIAI;
 
 const int INF = INT_MAX;
 int numofthreads;
