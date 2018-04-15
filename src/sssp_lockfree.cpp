@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <thread>
 #include <cstring>
+#include <stomic>
 #include "simplegraph.h"
 #include "lockfree_queue.h"
 #include "Timer.h"
@@ -31,9 +32,9 @@ void sssp() {
       int distance = input.node_wt[node] + input.edge_wt[e];
 
       int prev_distance = input.node_wt[dest];
-      
+
       if(prev_distance > distance) {
-	input.node_wt[dest] = distance;
+	input.node_wt[dest].compare_exchange_weak(prev_distance,distance);
 	if(!sq.push(dest)) {
 	  fprintf(stderr, "ERROR: Out of queue space.\n");
 	  exit(1);
@@ -44,8 +45,8 @@ void sssp() {
 }
 
 void write_output(SimpleCSRGraphUII &g, const char *out) {
-  FILE *fp; 
-  
+  FILE *fp;
+
   fp = fopen(out, "w");
   if(!fp) {
     fprintf(stderr, "ERROR: Unable to open output file '%s'\n", out);
@@ -67,7 +68,7 @@ void write_output(SimpleCSRGraphUII &g, const char *out) {
   }
 }
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
   if(argc != 4) {
     fprintf(stderr, "Usage: %s inputgraph outputfile numofthreads\n", argv[0]);
@@ -87,13 +88,13 @@ int main(int argc, char *argv[])
   if(!input.load_file(argv[1])) {
     fprintf(stderr, "ERROR: failed to load graph\n");
     exit(1);
-  } 
+  }
 
   printf("Loaded '%s', %u nodes, %u edges\n", argv[1], input.num_nodes, input.num_edges);
 
   /* if you want to use dynamic allocation, go ahead */
   sq.initialize(input.num_edges * 2); // should be enough ...
-  
+
   ggc::Timer t("sssp");
 
   int src = 0;
