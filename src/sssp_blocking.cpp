@@ -17,7 +17,7 @@ const int INF = INT_MAX;
 int numofthreads;
 SimpleCSRGraphUII input;
 BlockingQueue sq;
-int check[170] = {0};
+std::atomic<int> check[170] = {};
 
 void sssp_init(unsigned int src) {
   for(int i = 0; i < input.num_nodes; i++) {
@@ -28,7 +28,7 @@ void sssp_init(unsigned int src) {
 void sssp(int t) {
   
   int node;
-  bool flag = true;
+  bool flag;
   
   while(true){
     flag = true;
@@ -59,14 +59,18 @@ void sssp(int t) {
     check[t] = 1;
     for(int i = 0; i < numofthreads; i++)
     {
-      if(!check[i])
+      if(!check[i].load())
       {
         flag = false;
         break;
       }
     }
     if(flag)
-      break;
+    {
+      printf("%d thread returns.",t);
+      return;
+
+    }
     else
       continue;
     
