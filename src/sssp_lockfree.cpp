@@ -16,7 +16,7 @@ const int INF = INT_MAX;
 int numofthreads;
 SimpleCSRGraphUII input;
 LockfreeQueue sq;
-std::atomic<int> count{0};
+std::atomic<int> check[170] = {};
 
 void sssp_init(unsigned int src) {
   for(int i = 0; i < input.num_nodes; i++) {
@@ -24,10 +24,12 @@ void sssp_init(unsigned int src) {
   }
 }
 
-void sssp() {
+void sssp(int t) {
   bool changed = false;
   int node;
-  
+  bool flag;
+  while(true){
+    flag = true;
     while(sq.pop(node)) {
       for(unsigned int e = input.row_start[node]; e < input.row_start[node + 1]; e++) {
 
@@ -51,6 +53,25 @@ void sssp() {
       }
    
     }
+    check[t] = 1;
+    for(int i = 0; i < numofthreads; i++)
+    {
+      if(!check[i].load())
+      {
+        flag = false;
+        break;
+      }
+    }
+    if(flag)
+    {
+      //printf("%d thread returns.",t);
+      return;
+
+    }
+    else
+      continue;
+    
+  }
     
   }
 
@@ -117,7 +138,7 @@ int main(int argc, char *argv[])
   sq.push(src);
   for(int i = 0; i < numofthreads; i++)
   {
-    threads[i] = std::thread(sssp);
+    threads[i] = std::thread(sssp,i);
   }
   for(int i = 0; i < numofthreads; i++)
   {

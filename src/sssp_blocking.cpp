@@ -67,7 +67,7 @@ void sssp(int t) {
     }
     if(flag)
     {
-      printf("%d thread returns.",t);
+      //printf("%d thread returns.",t);
       return;
 
     }
