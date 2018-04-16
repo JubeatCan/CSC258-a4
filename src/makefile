@@ -1,4 +1,4 @@
-all: sssp_serial bq_test lf_test sssp_blocking sssp_lockfree
+all: sssp_serial sssp_blocking sssp_lockfree
 
 sssp_serial: sssp_serial.cpp Timer.h simplegraph.h serialqueue.h
 	g++ -g -O3 $< -o $@
