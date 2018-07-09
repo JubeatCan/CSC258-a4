@@ -1,3 +1,3 @@
 # CSC258-a4
 
-## _For assignment 4_
+Assignment 4 for Distribute and parallel system
